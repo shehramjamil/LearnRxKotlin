@@ -1,0 +1,9 @@
+Flowable are used when producer emits faster than consumer and chances are that consumer will miss or cannot handle the emissions
+Supports back Pressure Strategies - Flowable are for data above 10k items
+Flowable emits data in chunks and waits for consumer to coup up
+Flowable is slower than observable
+Subscriber has benefits[can request desired amount of stream using request method] and supports backpressure strategies
+
+
+Important
+All the strategies in this package are to handle the back pressure at the downstream means at the consumer side

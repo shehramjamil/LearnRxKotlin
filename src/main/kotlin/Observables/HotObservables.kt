@@ -8,7 +8,6 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.ReplaySubject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import java.util.concurrent.TimeUnit
 
 fun main() {
 
@@ -68,8 +67,11 @@ fun main() {
     asyncSubject2.onNext(1)
     asyncSubject2.onNext(2)
     asyncSubject2.onNext(3)
+    asyncSubject2.subscribe(observer)
+    asyncSubject2.onNext(4)
     asyncSubject2.onComplete()  // Async only emits on calling onComplete
     asyncSubject2.subscribe(observer)
+
 
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -134,9 +136,6 @@ fun main() {
     publishSubject.onNext(6)
 
     runBlocking { delay(1100)}
-
-
-
 
 }
 
