@@ -1,4 +1,4 @@
-package coldFlowable
+package flowable.coldFlowable
 
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable

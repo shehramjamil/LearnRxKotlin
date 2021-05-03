@@ -1,4 +1,4 @@
-package hotFlowable
+package flowable.hotFlowable
 
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
