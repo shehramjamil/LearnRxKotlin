@@ -103,6 +103,7 @@ fun switchIfEmpty() {
 fun startWith()
 {
     // It adds an element above all the elements of the producer
+    // we can start with an iterator or an observable or a single item
     Observable.range(0,10).startWith(Observable.just(-1))
         .subscribe {
             println("Received $it")

@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit
 // take, takeLast, takeUntil, and takeWhile
 
 fun main() {
+
     //debounce()
     //distinct()
     //distinctUntilChanged()
@@ -25,6 +26,17 @@ fun main() {
     //filter()
     //firstAndLast()
     //ignoreElements()
+
+    //skip()
+    //skipLast()
+    //skipWhile(), unlike filter, it terminates when condition becomes false and start emission further
+    //skipUntil()
+
+    //totally opposite of skip operator, implementation is skipped
+    //take()
+    //takeLast()
+    //takeWhile()
+    //takeUntil()
 }
 
 fun debounce() {
@@ -77,22 +89,20 @@ fun elementAt() {
         .subscribe { println("Element at Operator =  $it") }
 }
 
-fun filter()
-{
+fun filter() {
     // filters according to the condition put in filter lamda function
-    listOf(1,2,3,4,5).toObservable().filter {
+    listOf(1, 2, 3, 4, 5).toObservable().filter {
         it - 2 == 0
     }.subscribe {
         println("Filter Operator = $it")
     }
 }
 
-fun firstAndLast()
-{
+fun firstAndLast() {
     // To emit first and last value in a list
     // we can also set default value if we get empty list
 
-    val observable = Observable.range(1,10)
+    val observable = Observable.range(1, 10)
     observable.first(2)
         .subscribeBy { item -> println("Received $item") }
     observable.last(2)
@@ -101,12 +111,64 @@ fun firstAndLast()
         .subscribeBy { item -> println("Received $item") }
 }
 
-fun ignoreElements()
-{
+fun ignoreElements() {
     // Sometimes, you may require to listen only on the onComplete of a producer. The
     // ignoreElements operator helps you to do that.
-    val observable = Observable.range(1,10)
+    val observable = Observable.range(1, 10)
     observable
         .ignoreElements()
         .subscribe { println("Completed") }
 }
+
+fun skip() {
+    // It takes a count as parameter and skip untill that count reaches
+
+    Observable.range(1, 20).skip(5).subscribe {
+        println("Items after skip = $it")
+    }
+
+    // Skip also takes time as parameter to skip items for a particular time
+    Observable.range(1, 100000000).skip(400, TimeUnit.MILLISECONDS).subscribe {
+        println("Items after skip = $it")
+    }
+    runBlocking { delay(1000) }
+}
+
+fun skipLast() {
+    Observable.range(1, 20).skipLast(5).subscribe {
+        println("Items after skip = $it")
+    }
+
+}
+
+fun skipWhile() {
+    // it takes a logic to be true for skipping the elements
+    Observable.range(1, 200).skipWhile {
+        it < 100
+    }.subscribe {
+        println(it)
+    }
+}
+
+fun skipUntil() {
+
+    // Think of a situation where you're working with two producers, producer1 and producer2,
+    // and want to start processing emissions from producer1 as soon as producer2 starts emitting.
+
+    // here observable start emitting but those emission will be skipped until 100 ms, emissions after 100 ms
+    // will be consumed by the subscriber
+
+    val observable1 = Observable.range(1,10000000)
+    val observable2 = Observable.interval(100, TimeUnit.MILLISECONDS)
+    observable1.skipUntil(observable2)
+        .subscribe{
+            println(it)
+        }
+    runBlocking { delay(5000)}
+
+}
+
+fun take(){}
+fun takeLast(){}
+fun takeWhile(){}
+fun takeUntil(){}

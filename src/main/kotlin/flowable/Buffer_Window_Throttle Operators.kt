@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit
 
 fun main() {
     bufferOperator()
-    windowOperator()
-    throttleOperator()
+   // windowOperator()
+    //throttleOperator()
 }
 
 
