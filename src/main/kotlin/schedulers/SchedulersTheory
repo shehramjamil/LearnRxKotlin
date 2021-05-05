@@ -1,0 +1,85 @@
+package schedulers
+
+Schedulers are used to select a thread from thread pool are used to achieve concurrency and parallel work
+
+Thread pool represents a group of worker threads that are waiting for the job and reuse many times.
+
+1.Schedulers.io() = bound scheduler
+
+For input/output operations - when we perform an IO task, a thread is assigned for it which can be re-used
+for other operations. If that thread is busy, then a new thread will be created to handle the operation.
+It has benefits but if a huge number of threads are created, then it has effect on CPU. [outOfMemory could happen]
+But good thing is thread in this scheduler are removed after 60 seconds[time can vary] of inactivity
+
+2.Schedulers.computation() = bound scheduler
+
+The number of threads in this thread pool that can be used is fixed to the number of cores present in the system.
+So if you have two cores in your mobile, it will have 2 threads in the pool.
+This also means that if these two threads are busy then the process will have to wait for them to be available.
+
+why we use computation() for intensive tasks?
+Because computation() threads do not make threads more than cpu cores and utilise cpu properly and reuse them.
+
+why we separate io() thread pool from computation() thread pool?
+Why we should not mix them?
+
+I/O operations on the other hand (reading from a database, network etc.) take longer as the
+OS has to wait for underlying hardware to retrieve and deliver the data.
+When we perform aTypically the underlying hardware sends out a signal IOWait to the OS while
+the underlying hardware is out and about doing the IO work
+Instead of sitting and twiddling its thumbs, the OS should be finishing other tasks in the meantime (especially ones that are not
+waiting on underlying hardware) through other threads
+
+This is why you don’t want to mix CPU and I/O threads in the same pool.
+You could potentially have a whole bunch of them IOWaiting and precious CPU work that could otherwise be done in the meantime,
+will also hang in the process waiting for that I/O work.
+
+
+3.Schedulers.newThread() vs Scheduler.io()
+
+The Schedulers.io() uses a thread pool, and whenever it gets a new unit of work, it first
+looks into the thread pool to see if any idle thread is available to take up the task; it
+proceeds to create a new thread if no pre-existing thread is available to take up the work.
+However,
+
+Schedulers.newThread() doesn't even use a thread pool; instead, it creates a
+new thread for every request and forgets them forever.
+
+
+4.Schedulers.single() = Single thread = enqueue tasks coming from main thread and do them sequentially and in parallel
+
+The Schedulers.single() provides us with a scheduler that contains only one thread
+and returns the single instance for every call.
+Think of a situation where you need to execute tasks that are strongly
+sequential—Schedulers.single() is the best available option for you here. As it
+provides you with only one thread, every task that you [enqueue] here is bound to be
+executed sequentially and in parallel to the calling thread.
+
+
+5.Schedulers.trampoline()
+Also for sequential execution
+It is sequential with the main thread but it does not do work in parallel.
+
+
+6.Schedulers.from()
+we can create a custom pool of threads by specifying the size of pool
+val executor:Executor = Executors.newFixedThreadPool(2)
+val scheduler:Scheduler = Schedulers.from(executor)
+In this case we have only two threads which runs in parallel without blocking anything and when one thread is free,
+then it will take the other task.
+A very good example is below
+
+Observable.range(1, 10)
+.subscribeOn(scheduler)
+.subscribe {runBlocking { delay(200) }
+println("Observable1 Item Received $it -${Thread.currentThread().name}")}
+
+Observable.range(21, 10)
+.subscribeOn(scheduler)
+.subscribe {runBlocking { delay(100) }println("Observable2 Item Received $it -${Thread.currentThread().name}")}
+
+Observable.range(51, 10).subscribeOn(scheduler)
+.subscribe {
+runBlocking { delay(100) }
+println("Observable3 Item Received $it -${Thread.currentThread().name}")}
+runBlocking { delay(10000) }
